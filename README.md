@@ -1,2 +1,0 @@
-# kapsel-sains-komputasi
--
