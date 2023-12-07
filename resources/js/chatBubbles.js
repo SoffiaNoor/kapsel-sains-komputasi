@@ -10,6 +10,7 @@ function appendNewChatBubble(theSender, theMessage, theTime, theTimeAgo, isFile,
   messageNode.style.border = "1px solid #ccc";
   messageNode.style.borderRadius = "10px";
   messageNode.style.marginBottom = "2px";
+  messageNode.style.backgroundColor = "white";
   messageNode.style.marginTop = "15px";
   messageNode.classList.add("animate__animated");
   messageNode.classList.add("animate__fadeInUp");    //fadeInUp, fadeIn
@@ -32,11 +33,13 @@ function appendNewChatBubble(theSender, theMessage, theTime, theTimeAgo, isFile,
     fileLink.style.marginLeft = "8px";
     messageNode.style.fontWeight = "600";
     messageNode.style.fontStyle = "italic";
+    messageNode.style.backgroundColor = "white";
+
   }
 
   if(theSender == senderId){
     messageNode.style.float = "right";
-    messageNode.style.backgroundColor = "black";
+    messageNode.style.backgroundColor = "white";
     messageNode.style.borderBottomRightRadius = "0";
     messageNode.style.marginLeft = "50px";
 
@@ -44,7 +47,7 @@ function appendNewChatBubble(theSender, theMessage, theTime, theTimeAgo, isFile,
   }
   else{
     messageNode.style.float = "left";
-    messageNode.style.backgroundColor = "black";
+    messageNode.style.backgroundColor = "white";
     messageNode.style.borderBottomLeftRadius = "0";
     messageNode.style.marginRight = "50px";
 
@@ -80,7 +83,7 @@ function appendSecuredAlertBubble(){
   // alertNode.style.border = "1px solid #ccc";
   alertNode.style.borderRadius = "10px";
   alertNode.style.margin = "15px auto";
-  alertNode.style.backgroundColor = "black";
+  alertNode.style.backgroundColor = "white";
   alertNode.style.textAlign = "center";
   alertNode.style.fontSize = "14px";
   alertNode.style.width = "90%";
