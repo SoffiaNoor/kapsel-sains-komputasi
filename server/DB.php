@@ -12,7 +12,7 @@
 
         private function databaseConnection()
         {
-            if($db = mysqli_connect('localhost', 'root', '', 'sp_chat'))
+            if($db = mysqli_connect('localhost', 'root', '', 'sp_chat_trial'))
             {
                 return $db;
             }
@@ -24,7 +24,7 @@
 
         private function databaseSelection()
         {
-            mysqli_select_db($this->db_conn, 'sp_chat');
+            mysqli_select_db($this->db_conn, 'sp_chat_trial');
         }
 
         public static function getInstance()

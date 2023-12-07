@@ -663,9 +663,61 @@ class DES{
     }
 }
 
+
 class RSA{
+    private $publicKey;
+    private $privateKey;
 
   function __construct() {}
+
+  public function generateKeypair() {
+    $config = array(
+        'config' => 'C:\xampp\htdocs\tubes\openssl.cnf',
+        'default_md' => 'sha512',
+        'private_key_bits' => 2048,
+        'private_key_type' => OPENSSL_KEYTYPE_RSA,
+    );
+
+    $keypair = openssl_pkey_new($config); //This is actually generates private key
+    $exportedKey = openssl_pkey_export($keypair, $privkey, null, $config);
+    $this->privateKey = $privkey;
+    $pubkey = openssl_pkey_get_details($keypair);
+    $this->publicKey = $pubkey['key'];
+    
+  }
+
+  public function getPrivateKey() {
+    return $this->privateKey;
+  }
+
+  public function getPublicKey() {
+    return $this->publicKey;
+  }
+
+  private function encrypt2($message) {
+    openssl_public_encrypt($message, $encryptedData, $this->publicKey);
+    return $encryptedData;
+  }
+
+  public function encryptAndEncode($message) {
+    $encryptedMsgInBase64 = base64_encode($this->encrypt2($message));
+    return $encryptedMsgInBase64;
+  }
+  private function decrypt2($cipherText) {
+    openssl_private_decrypt($cipherText, $decryptedData, $this->privateKey);
+    return $decryptedData;
+  }
+
+  public function decodeAndDecrypt($cipherText) {
+    $decodedEncryptedMsg = base64_decode($cipherText);
+    return $this->decrypt2($decodedEncryptedMsg);
+  }
+
+  public function decodeAndDecryptWithPrivateKey($cipherText, $privateKey) {
+    $decodedEncryptedMsg = base64_decode($cipherText);
+    openssl_private_decrypt($decodedEncryptedMsg, $decryptedData, $privateKey);
+    return $decryptedData;
+  }
 
   function findRandomPrime($p)
   {

@@ -33,6 +33,9 @@
   $d = 0;
   $c = "";
   $everySeparate = "";
+  $pub_key="";
+  $priv_key = "";
+  $encryptedMsg = "";
 
   // echo $message;
 
@@ -95,6 +98,14 @@
     $zRsa = $rsa->eular_z($pRsa, $qRsa);
     $eRsa = $rsa->find_e($zRsa);
     $dRsa = $rsa->find_d($eRsa, $zRsa);
+    //bikinan kami
+    $rsa->generateKeypair(); //ntar coba tak masukin ke konstruktor aee
+    $priv_key = $rsa->getPrivateKey();
+    $pub_key = $rsa->getPublicKey();
+    $encryptedMsg = $rsa->encryptAndEncode($message);
+    // $priv_key = "kunci privat";
+    // $pub_key = "kunci publik";
+    //bikinan kami
     list($cRsa, $everySeparateRsa) = $rsa->encrypt($message, $eRsa, $nRsa);
     $eMessage = $cRsa;
   }
@@ -116,7 +127,9 @@
   $row = mysqli_fetch_assoc($result);
   $receiverToken = $row['token'];
 
-  $query = "INSERT INTO chat (sender_id, receiver_id, message, is_file, file_name, enc_method, s_token, r_token) VALUES($senderId, $receiverId, '$eMessage', $isFile, '$fileName', $encMethodId, '$senderToken', '$receiverToken')";
+  $query = "INSERT INTO chat (sender_id, receiver_id, message, message2, is_file, file_name, enc_method, s_token, r_token) 
+            VALUES($senderId, $receiverId, '$eMessage', '$encryptedMsg',  $isFile, 
+            '$fileName', $encMethodId, '$senderToken', '$receiverToken')";
   if($db->query($query) !== true){
     echo "Messsage Has not sent due to an error -1. ".mysqli_error($db);
   }
@@ -135,7 +148,9 @@
       }
     }
     else if($encMethodId == 2){
-      $query = "INSERT INTO rsa (message_id, d, n, every_separate) VALUES ($lastChatId, '$dRsa', '$nRsa', '$everySeparateRsa')";
+      $query = "INSERT INTO rsa (message_id, d, n, every_separate, privateKey, publicKey) 
+                VALUES ($lastChatId, '$dRsa', '$nRsa', '$everySeparateRsa', '$priv_key', '$pub_key')";
+
       if($db->query($query) !== true){
         echo "Messsage Has not sent due to an error 2. ".mysqli_error($db);
       }

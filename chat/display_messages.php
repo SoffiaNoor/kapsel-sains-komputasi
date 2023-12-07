@@ -88,8 +88,12 @@
                 ORDER BY timestamp";
       $rsaResult = mysqli_query($db, $query);
       $rsaRow = mysqli_fetch_assoc($rsaResult);
-      $message = $RSA->decrypt($row['message'], $rsaRow['d'], $rsaRow['n'], $rsaRow['every_separate']);
+      $msg2 = $RSA->decodeAndDecryptWithPrivateKey($row['message2'], $rsaRow['privateKey']);
+      // $message = $RSA->decrypt($row['message'], $rsaRow['d'], $rsaRow['n'], $rsaRow['every_separate']);
+      $message = $msg2;
+      // yang di atas ini yang pake openssl, line 92 itu yang lama ;
     }
+    
     else if($enc == 3){
       $query = "SELECT *
                 FROM gamal
