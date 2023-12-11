@@ -14,21 +14,20 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
--- Dumping database structure for sp_chat_trial
-CREATE DATABASE IF NOT EXISTS `sp_chat_trial` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-USE `sp_chat_trial`;
-
 -- Dumping structure for table sp_chat_trial.aes
 CREATE TABLE IF NOT EXISTS `aes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `message_id` int(11) NOT NULL,
   `cipher` longtext NOT NULL,
+  `cipher2` longtext DEFAULT NULL,
   `sender_key` longtext NOT NULL,
   `receiver_key` longtext NOT NULL,
+  `new_key` longtext DEFAULT NULL,
+  `iv` longtext DEFAULT NULL,
+  `tag` longtext DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
@@ -48,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `chat` (
   `r_token` varchar(255) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=508 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
@@ -103,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `rsa` (
   `publicKey` longtext NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=246 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=252 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
@@ -114,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `session` (
   `receiver_id` int(11) NOT NULL,
   `sender_key` longtext NOT NULL,
   `receiver_key` longtext NOT NULL,
+  `new_key` longtext DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -14,20 +14,33 @@ function ajaxDiffieHellman(){
     proots = dh.findPrimitives(q);
     prootsLength = dh.findPrimitives(q).length;
     a = proots[Math.round(Math.random() * prootsLength)];
-    xa = (Math.random() * q - 1) + 2;
-    xb = (Math.random() * q - 1) + 2;
+    xa = (Math.random() * q - 1) + 2; //SA
+    xb = (Math.random() * q - 1) + 2; //SB
 
     //Public Key Alice
-    ya = dh.mpmod(a, xa, q)
+    ya = dh.mpmod(a, xa, q) //P-SA
     //Public Key Bob
-    yb = dh.mpmod(a, xb, q)
+    yb = dh.mpmod(a, xb, q) //P-SB
     //Secret
-    _a = dh.mpmod(yb, xa, q)
-    _b = dh.mpmod(ya, xb, q)
+    _a = dh.mpmod(yb, xa, q) //P-SA-SB
+    _b = dh.mpmod(ya, xb, q) //P-SA-SB
     if(_a == _b){
       break;
     }
   }
+
+//Bikinan kami
+  const array = new Uint8Array(32);
+  self.crypto.getRandomValues(array);
+    
+  let keyInHex = "";
+  // console.log("Your lucky numbers:");
+  for (const num of array) {
+      // console.log(num, " in hex: ", num.toString(16));
+      keyInHex += num.toString(16);
+  }
+  // console.log("final key: ", keyInHex)
+
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
@@ -37,7 +50,8 @@ function ajaxDiffieHellman(){
           // alert(this.status + " " + this.readyState);
       }
   };
-  var params = "sid=" + senderId + "&rid=" + receiverId + "&skey=" + _a + "&rkey=" + _b;
+  // var params = "sid=" + senderId + "&rid=" + receiverId + "&skey=" + _a + "&rkey=" + _b;
+  var params = "sid=" + senderId + "&rid=" + receiverId + "&skey=" + _a + "&rkey=" + _b + "&newkey=" + keyInHex;
   xmlhttp.open("POST", "insert_both_keys.php", true);
   xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xmlhttp.send(params);

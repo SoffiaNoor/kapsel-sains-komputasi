@@ -6,6 +6,7 @@
     $receiverId = $_POST['rid'];
     $senderKey = $_POST['skey'];
     $receiverKey = $_POST['rkey'];
+    $newKey = $_POST['newkey']; //bikinan kami
 
     $query = "SELECT * FROM session 
               WHERE (sender_id=$senderId OR sender_id=$receiverId) AND (receiver_id=$receiverId OR receiver_id=$senderId)";
@@ -14,15 +15,19 @@
 
     if($numOfRows > 0){
       $query = "UPDATE session
-                SET sender_key='$senderKey', receiver_key='$receiverKey'
-                WHERE (sender_id=$senderId OR sender_id=$receiverId) AND (receiver_id=$receiverId OR receiver_id=$senderId)";
+                -- SET sender_key='$senderKey', receiver_key='$receiverKey'
+                SET sender_key='$senderKey', receiver_key='$receiverKey', new_key= '$newKey'
+                WHERE (sender_id=$senderId OR sender_id=$receiverId) AND 
+                      (receiver_id=$receiverId OR receiver_id=$senderId)";
       if($db->query($query) !== true){
         echo "Keys are not updated due to an error".mysqli_error($db);;
       }
     }
     else{
-      $query = "INSERT INTO session (sender_id, receiver_id, sender_key, receiver_key)
-      VALUES ('$senderId', '$receiverId', '$senderKey', '$receiverKey')";
+      // $query = "INSERT INTO session (sender_id, receiver_id, sender_key, receiver_key)
+      // VALUES ('$senderId', '$receiverId', '$senderKey', '$receiverKey')";
+      $query = "INSERT INTO session (sender_id, receiver_id, sender_key, receiver_key, new_key)
+      VALUES ('$senderId', '$receiverId', '$senderKey', '$receiverKey', '$newKey')";
       if($db->query($query) !== true){
         echo "Keys are not stored due to an error".mysqli_error($db);;
       }

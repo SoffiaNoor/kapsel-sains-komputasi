@@ -680,9 +680,9 @@ class RSA{
 
     $keypair = openssl_pkey_new($config); //This is actually generates private key
     $exportedKey = openssl_pkey_export($keypair, $privkey, null, $config);
-    $this->privateKey = $privkey;
+    $this->privateKey = $privkey; //get private key
     $pubkey = openssl_pkey_get_details($keypair);
-    $this->publicKey = $pubkey['key'];
+    $this->publicKey = $pubkey['key']; //get public key
     
   }
 
@@ -819,7 +819,41 @@ class RSA{
 
 class AES{
       //128 bits, key = 128 (least security) or 192 or 256 (highest security) bits [SOLVED] ==> str_split
-      //Text XOR Key
+      //Text XOR 
+    // Keybikinan kami
+    private $iv;
+    private $tag;
+    public $ciphertext;
+    public function generateIV() {
+        $this->iv = openssl_random_pseudo_bytes(16); // 128 bits
+        return $this->iv;
+    }
+     
+    public function encryptAES256GCM($plaintext, $key, $iv) {
+        $this->ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $this->iv, $this->tag);
+        // echo "Di fungsi encrypt: ".$ciphertext."<br>";
+        // echo "Di fungsi encrypt(tag): ".$tag."<br>";
+        // echo "Di fungsi encrypt(this->tag): ".$this->tag."<br>";
+        return [$this->ciphertext, $this->tag];
+    }
+    
+    // public function encryptAES256GCMAndEncode($message, $key) {
+    //     $encryptedMsgInBase64 = base64_encode($this->encryptAES256GCM($message, $key, $this->iv));
+    //     return $encryptedMsgInBase64;
+    //  }
+    
+    public function getCipherText() {
+        return $this->ciphertext;
+    }
+
+      public function getTag() {
+        return $this->tag;
+    }
+
+    public function decryptAES256GCM($ciphertext, $tag, $key, $iv) {
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        return $plaintext;
+    }
     
       function keyGen($key, int $rounds)
       {

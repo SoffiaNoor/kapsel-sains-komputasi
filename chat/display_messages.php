@@ -66,6 +66,14 @@
       $aesRow = mysqli_fetch_assoc($aesResult);
 
       $cipherAesBin = hex2bin($aesRow['cipher']);  // As MySQL can not store it
+      //Bikinan kami
+      $newKey =  $aesRow['new_key'];//bikinan kami
+      $newKeyAes = hex2bin($newKey); //bikinan kami
+      $cipher2AesBin =  base64_decode($aesRow['cipher2']); 
+      $tagBin = base64_decode($aesRow['tag']);
+      $ivBin = base64_decode($aesRow['iv']);
+      $decryptedText = $AES->decryptAES256GCM($cipher2AesBin, $tagBin, $newKeyAes, $ivBin);
+      // $decryptedText = "awokkkk";
 
       $ciphertext = str_split($cipherAesBin,16);
       $finalPlainText = "";
@@ -75,9 +83,11 @@
           
           $plain = hex2bin($plain);
           $removeThePadKeyword = str_replace('#', '', $plain);
-          $finalPlainText .= $removeThePadKeyword;
+          // $finalPlainText .= $removeThePadKeyword;
       }
-      $message = $finalPlainText;
+      // $message = $finalPlainText;
+      // $message = $finalPlainText.",".$decryptedText;
+      $message = $decryptedText;
       // echo $message;
     }
     else if($enc == 2){

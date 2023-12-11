@@ -14,6 +14,12 @@
   $cipherAes = "";
   $senderKeyAes = "";
   $receiverKeyAes = "";
+// bikinan kami
+  $newKey = "";
+  $newKeyAes = "";
+  $ivEncoded = "";
+  $cipher2Aes = "";
+  $tagEncoded = "";
 
   $keyDes = "";
   $cipherDes = "";
@@ -70,6 +76,9 @@
       $row = mysqli_fetch_assoc($result);
       $senderKeyAes = $row['sender_key'];
       $receiverKeyAes = $row['receiver_key'];
+      $newKey =  $row['new_key'];//bikinan kami
+      $newKeyAes = hex2bin($newKey); //bikinan kami
+      // $decodednewKeyAes = hexbin
 
       $aes = new AES();
       $messageAes = $message;
@@ -87,7 +96,21 @@
           $cipherAes .= $cipher;
       }
 
+      // bikinan kami
+      $ivAes = $aes->generateIV();
+      // $cipherText = $aes->encryptAES256GCM($message, $newKeyAes, $ivAes);
+      $aes->encryptAES256GCM($message, $newKeyAes, $ivAes);
+      $cipherText = $aes->getCipherText();
+      $tag = $aes->getTag();
+
+      // encoded to base64 to store them to database
+      $ivEncoded = base64_encode($ivAes);
+      $cipher2Aes = base64_encode($cipherText);
+      // $cipher2Aes = $cipherText;
+      $tagEncoded = base64_encode($tag);
+
       $eMessage = $cipherAes;
+      $encryptedMsg = $cipher2Aes;
     }
   }
   else if($encMethodId == 2){
@@ -142,7 +165,11 @@
       }
     }
     else if($encMethodId == 1){
-      $query = "INSERT INTO aes (message_id, cipher, sender_key, receiver_key) VALUES ($lastChatId, '$cipherAes', '$senderKeyAes', '$receiverKeyAes')";
+      // $query = "INSERT INTO aes (message_id, cipher, sender_key, receiver_key) 
+      //           VALUES ($lastChatId, '$cipherAes', '$senderKeyAes', '$receiverKeyAes')";
+      $query = "INSERT INTO aes (message_id, cipher, cipher2, sender_key, receiver_key, new_key, iv, tag) 
+                VALUES ($lastChatId, '$cipherAes', '$cipher2Aes', '$senderKeyAes', '$receiverKeyAes', 
+                        '$newKey', '$ivEncoded', '$tagEncoded')";
       if($db->query($query) !== true){
         echo "Messsage Has not sent due to an error 1. ".mysqli_error($db);
       }
