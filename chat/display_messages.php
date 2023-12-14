@@ -58,68 +58,7 @@
       $decryptedText = $aes->decryptAES256GCM($encryptedMsg, $tagBin, $aesKey, $ivBin);
       $message = $decryptedText;
     }
-    else if($enc == 1){
-      $AES = new AES();
-      $query = "SELECT *
-                FROM aes
-                WHERE message_id=$chatId
-                ORDER BY timestamp";
-      $aesResult = mysqli_query($db, $query);
-      $aesRow = mysqli_fetch_assoc($aesResult);
-
-      $cipherAesBin = hex2bin($aesRow['cipher']);  // As MySQL can not store it
-      //Bikinan kami
-      $newKey =  $aesRow['new_key'];//bikinan kami
-      $newKeyAes = hex2bin($newKey); //bikinan kami
-      $cipher2AesBin =  base64_decode($aesRow['cipher2']); 
-      $tagBin = base64_decode($aesRow['tag']);
-      $ivBin = base64_decode($aesRow['iv']);
-      $decryptedText = $AES->decryptAES256GCM($cipher2AesBin, $tagBin, $newKeyAes, $ivBin);
-      // $decryptedText = "awokkkk";
-
-      $ciphertext = str_split($cipherAesBin,16);
-      $finalPlainText = "";
-      for($i=0 ; $i<count($ciphertext) ; $i++)
-      {
-          $plain = $AES->AES_DECRYPT($ciphertext[$i], $aesRow['receiver_key']);
-          
-          $plain = hex2bin($plain);
-          $removeThePadKeyword = str_replace('#', '', $plain);
-          // $finalPlainText .= $removeThePadKeyword;
-      }
-      // $message = $finalPlainText;
-      // $message = $finalPlainText.",".$decryptedText;
-      $message = $decryptedText;
-      // echo $message;
-    }
-    else if($enc == 2){
-      $RSA = new RSA();
-      $query = "SELECT *
-                FROM rsa
-                WHERE message_id=$chatId
-                ORDER BY timestamp";
-      $rsaResult = mysqli_query($db, $query);
-      $rsaRow = mysqli_fetch_assoc($rsaResult);
-      $msg2 = $RSA->decodeAndDecryptWithPrivateKey($row['message2'], $rsaRow['privateKey']);
-      // $message = $RSA->decrypt($row['message'], $rsaRow['d'], $rsaRow['n'], $rsaRow['every_separate']);
-      $message = $msg2;
-      // yang di atas ini yang pake openssl, line 92 itu yang lama ;
-    }
     
-    else if($enc == 3){
-      $query = "SELECT *
-                FROM gamal
-                WHERE message_id=$chatId
-                ORDER BY timestamp";
-      $gamalResult = mysqli_query($db, $query);
-      $gamalRow = mysqli_fetch_assoc($gamalResult);
-
-      $gamalData[] = $gamalRow['c1'];
-      $gamalData[] = $row['message'];
-      $gamalData[] = $gamalRow['xa'];
-      $gamalData[] = $gamalRow['q'];
-      $gamalData[] = $gamalRow['every_separate'];
-    }
 
     $node[] = $sender;
     $node[] = $receiver;
