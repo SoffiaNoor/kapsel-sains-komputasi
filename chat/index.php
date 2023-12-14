@@ -99,10 +99,7 @@
                   <select id="enc-method"
                     style="margin-top:15px; padding:8px; cursor:pointer; border-radius:8px; background-color:#f3f3f3; width: 100%;">
                     <option disabled>Encryption Method - </option>
-                    <option value="des">DES</option>
-                    <option value="aes">AES</option>
-                    <option selected value="rsa">RSA</option>
-                    <option value="gamal">ElGamal</option>
+                    <option value="des">RSA+AES</option>
                   </select>
                 </div>
 

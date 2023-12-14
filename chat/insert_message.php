@@ -21,6 +21,8 @@
   $cipher2Aes = "";
   $tagEncoded = "";
 
+  $eMessage = "";
+
   $keyDes = "";
   $cipherDes = "";
   $senderKeyDes = "";
@@ -41,31 +43,37 @@
   $everySeparate = "";
   $pub_key="";
   $priv_key = "";
+  $encryptedKey = "";
   $encryptedMsg = "";
 
   // echo $message;
 
   if($encMethodId == 0){
-    $query = "SELECT * FROM session 
-              WHERE (sender_id=$senderId OR sender_id=$receiverId) AND (receiver_id=$receiverId OR receiver_id=$senderId)";
-    $result = mysqli_query($db, $query);
-    $numOfRows = mysqli_num_rows($result);
+    $rsa = new RSA();
+    //bikinan kami
+    $rsa->generateKeypair(); //ntar coba tak masukin ke konstruktor aee
+    $priv_key = $rsa->getPrivateKey();
+    $pub_key = $rsa->getPublicKey();
+    //mungkin generate aes di sini + iv
+    $aes = new AES();
+    $strongRandom = true;
+    $newKeyAes = openssl_random_pseudo_bytes(32, $strongRandom); // 256 bits
+    $ivAes = $aes->generateIV(); // 128 bits
+    //encrypt msg dgn aes
+    $aes->encryptAES256GCM($message, $newKeyAes, $ivAes);
+    //simpen tag
+    $cipherText = $aes->getCipherText(); //ambil cipher text
+    $tag = $aes->getTag();
+    //encode to base64 before storing them to db
+    $ivEncoded = base64_encode($ivAes);
+    $cipher2Aes = base64_encode($cipherText); // TO DO: change cipher2Aes to encodedCipherText
+    $tagEncoded = base64_encode($tag);
+    //encrypt kunci aes dgn pub_key
+    $encryptedKey = $rsa->encryptAndEncode($newKeyAes);
 
-    if($numOfRows > 0){
-      $row = mysqli_fetch_assoc($result);
-      $senderKeyDes = $row['sender_key'];
-      $receiverKeyDes = $row['receiver_key'];
-
-      $des = new DES();
-      $messageDes = $message;
-
-      $cipher = $des->DES_ENCRYPT($messageDes, $senderKeyDes);
-      $cipherDesSplit = str_split($cipher, 32);
-      $cipherDes= base_convert($cipherDesSplit[0], 2, 16) . base_convert($cipherDesSplit[1], 2, 16);
-
-      $eMessage = $cipherDes;
-    }
-  }
+    $encryptedMsg = $cipher2Aes;
+    //bikinan kami
+}
   else if($encMethodId == 1){
     $query = "SELECT * FROM session 
               WHERE (sender_id=$senderId OR sender_id=$receiverId) AND (receiver_id=$receiverId OR receiver_id=$senderId)";
@@ -150,16 +158,19 @@
   $row = mysqli_fetch_assoc($result);
   $receiverToken = $row['token'];
 
-  $query = "INSERT INTO chat (sender_id, receiver_id, message, message2, is_file, file_name, enc_method, s_token, r_token) 
-            VALUES($senderId, $receiverId, '$eMessage', '$encryptedMsg',  $isFile, 
-            '$fileName', $encMethodId, '$senderToken', '$receiverToken')";
+  $query = "INSERT INTO chat (sender_id, receiver_id, message, message2, iv, tag, 
+                              is_file, file_name, enc_method, s_token, r_token) 
+            VALUES($senderId, $receiverId, 'lama punya', '$encryptedMsg', '$ivEncoded', 
+                    '$tagEncoded', '$isFile', '$fileName', $encMethodId, '$senderToken', '$receiverToken')";
   if($db->query($query) !== true){
     echo "Messsage Has not sent due to an error -1. ".mysqli_error($db);
   }
   else{
     $lastChatId = $db->insert_id;
     if($encMethodId == 0){
-      $query = "INSERT INTO des (message_id, cipher, sender_key, receiver_key) VALUES ($lastChatId, '$cipherDes', '$senderKeyDes', '$receiverKeyDes')";
+      $query = "INSERT INTO rsa (message_id, d, n, every_separate, privateKey, publicKey, encryptedKey) 
+                VALUES ($lastChatId, 'yang lama', 'yang lama', 'yang lama', '$priv_key', '$pub_key', 
+                        '$encryptedKey')";
       if($db->query($query) !== true){
         echo "Messsage Has not sent due to an error 1. ".mysqli_error($db);
       }

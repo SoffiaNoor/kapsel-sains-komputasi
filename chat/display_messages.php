@@ -42,19 +42,21 @@
     $gamalData = [];
 
     if($enc == 0){
-      $DES = new DES();
+      $RSA = new RSA();
       $query = "SELECT *
-                FROM des
+                FROM rsa
                 WHERE message_id=$chatId
                 ORDER BY timestamp";
-      $desResult = mysqli_query($db, $query);
-      $desRow = mysqli_fetch_assoc($desResult);
-
-      $plainTextDes = $DES->DES_DECRYPT($desRow['cipher'], $desRow['receiver_key']);
-      $plainTextDesSplit = str_split($plainTextDes, 32);
-      $plainHexDes = base_convert($plainTextDesSplit[0], 2, 16) . base_convert($plainTextDesSplit[1], 2, 16);
-      $message = $plainHexDes;
-      // echo $message;
+      $rsaResult = mysqli_query($db, $query);
+      $rsaRow = mysqli_fetch_assoc($rsaResult);
+      //dekrip kunci aes
+      $aesKey = $RSA->decodeAndDecryptWithPrivateKey($rsaRow['encryptedKey'], $rsaRow['privateKey']);
+      $aes = new AES();
+      $encryptedMsg =  base64_decode($row['message2']); 
+      $tagBin = base64_decode($row['tag']);
+      $ivBin = base64_decode($row['iv']);
+      $decryptedText = $aes->decryptAES256GCM($encryptedMsg, $tagBin, $aesKey, $ivBin);
+      $message = $decryptedText;
     }
     else if($enc == 1){
       $AES = new AES();
